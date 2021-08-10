@@ -4,4 +4,3 @@ openvr
 Pillow~=7.1.2
 scipy
 tqdm~=4.46.0
-sqlite3
