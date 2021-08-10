@@ -1,6 +1,6 @@
 matplotlib~=3.2.1
 numpy~=1.18.4
 openvr
-Pillow~=7.1.2
+Pillow
 scipy
 tqdm~=4.46.0
