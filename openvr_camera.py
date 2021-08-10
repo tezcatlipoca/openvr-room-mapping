@@ -5,6 +5,8 @@ import sys
 import time
 from pathlib import Path
 import ctypes
+import triad_openvr as vr
+import pylab as plt
 
 import openvr
 import numpy as np
@@ -17,6 +19,10 @@ from database import COLMAPDatabase
 from read_write_model import qvec2rotmat, rotmat2qvec, Camera, CAMERA_MODEL_NAMES
 import read_write_model
 from reconstruct import ColmapFolder
+import triad_openvr as vr
+import pylab as plt
+
+v = vr.triad_openvr()
 
 def hmd_matrix_to_numpy(hmd_matrix):
   pose_arr = np.zeros((4, 4))
@@ -160,7 +166,25 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
   openvr.shutdown()
   plt.show()
 
+
+def iterate_devices():
+  deviceCount = 0
+  devices = {
+    'tracker': [],
+    'hmd': [],
+    'controller': [],
+    'tracking reference': []
+  }
+
+  for deviceName, device in v.devices.items():
+    device._id = deviceName.split("_").pop()
+    devices[device.device_class.lower()].append(device)
+    deviceCount += 1
+
+  print(devices)
+
 if __name__ == "__main__":
+  iterate_devices()
   parser = argparse.ArgumentParser()
 
   parser.add_argument("--nimages", type=int, default=25)
