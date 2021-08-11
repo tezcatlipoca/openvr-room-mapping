@@ -1,8 +1,8 @@
 NOTES.md
 __pycache__
 database.db
-geo_Regis.txt
+geo_regis.txt
 sparse*/
 images
 dense
-
+scanner.py

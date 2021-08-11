@@ -1,3 +1,6 @@
+# Aug 11, 2021:
+# This entire file is from: https://github.com/TriadSemi/triad_openvr
+#
 import time
 import sys
 import openvr
@@ -212,7 +215,7 @@ class triad_openvr():
             # Iterate through the pose list to find the active devices and determine their type
             for i in range(openvr.k_unMaxTrackedDeviceCount):
                 if poses[i].bDeviceIsConnected:
-                    device_serial = self.vr.getStringTrackedDeviceProperty(i,openvr.Prop_SerialNumber_String).decode('utf-8')
+                    device_serial = self.vr.getStringTrackedDeviceProperty(i,openvr.Prop_SerialNumber_String)
                     for device in config['devices']:
                         if device_serial == device['serial']:
                             device_name = device['name']
