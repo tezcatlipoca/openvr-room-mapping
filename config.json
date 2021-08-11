@@ -1,0 +1,14 @@
+{
+    "devices":[
+        {
+          "name": "hmd",
+          "type": "HMD",
+          "serial":"XXX-XXXXXXXX"
+        },
+        {
+          "name": "mystical_fuckpuck_1",
+          "type": "Vive Tracker",
+          "serial":"0x000002241D200490>"
+        }
+    ]
+}

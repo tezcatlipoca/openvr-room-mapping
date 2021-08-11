@@ -182,6 +182,7 @@ def iterate_devices():
     deviceCount += 1
 
   print(devices)
+  print("--------------------------------\n\n")
 
 if __name__ == "__main__":
   iterate_devices()

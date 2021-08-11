@@ -3,3 +3,6 @@ __pycache__
 database.db
 geo_Regis.txt
 sparse*/
+images
+dense
+
