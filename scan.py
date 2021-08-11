@@ -99,6 +99,9 @@ elapsed = interval
 while rval:
     rval, frame = vc.read()
     if(elapsed >= interval):
+        # Blur detection also detects black frames, this is useful because you can "pause" shooting by covering the lens.
+        # Mostly I want it because I'd like to feed this video frame-grabs and need to ensure those aren't blurry.
+        
         # https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
         # compute the Laplacian of the image and then return the focus
         # measure, which is simply the variance of the Laplacian
