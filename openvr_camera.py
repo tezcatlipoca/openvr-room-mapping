@@ -82,7 +82,6 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
   init_params = np.array((420.000000, (width/num_cameras)/2, height/2, 0.000000))
 
   camera_model = CAMERA_MODEL_NAMES['SIMPLE_RADIAL']
-
   cameras = {}
   camera_to_head_transforms = {}
 
@@ -97,7 +96,6 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
   images = []
 
   for i in range(num_images):
-
     poses, game_poses = openvr.VRCompositor().waitGetPoses(poses, None)
     hmd_pose = poses[openvr.k_unTrackedDeviceIndex_Hmd]
 
@@ -106,7 +104,6 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
       continue
 
     world_to_head = hmd_matrix_to_numpy(hmd_pose.mDeviceToAbsoluteTracking)
-
     world_to_cams = {id_:world_to_head @ head_to_cam @ convert_coordinate_system for (id_,head_to_cam) in camera_to_head_transforms.items()}
 
     image_buffer = (ctypes.c_ubyte * buffer_size)()
@@ -117,11 +114,8 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
       continue
 
     image_array = np.array(image_buffer)
-
     image_array = image_array.reshape((height, width, 4))
-
     image_array = image_array[:, :, 0:3]
-
     image_array = np.clip(image_array, 0, 255)
 
     for j, (cam_id, world_to_cam) in enumerate(world_to_cams.items()):
@@ -138,7 +132,6 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
       draw_axes(ax, transform_mat=world_to_cam)
 
     fig.show()
-
     fig.canvas.draw()
     fig.canvas.flush_events()
     time.sleep(delay_between_images)
@@ -149,7 +142,6 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
   print("All pictures taken")
 
   with open(save_dir.geo_reg_path, 'w') as geo_reg_file:
-
     for image in images:
       image_id = db.add_image(image=image)
       image.id = image_id
