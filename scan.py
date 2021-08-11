@@ -5,8 +5,11 @@ import cv2
 import pylab as plt
 import numpy as np
 from scipy.spatial.transform import Rotation
+
+from reconstruct import ColmapFolder
 from vendor import triad_openvr 
 from vendor import read_write_model 
+from vendor import database
 
 # Settings from config.json
 config = json.load(open("config.json","r"))
@@ -16,6 +19,10 @@ device_name=config["settings"]["use_device"]
 camera_index=config["settings"]["camera_index"]
 colors = config["colors"]
 
+# Output
+output_directory = ColmapFolder("./OUTPUT")
+db = database.COLMAPDatabase.connect(output_directory.database_path)
+db.create_tables()
 
 def returnCameraIndexes():
     # checks the first 10 indexes.
@@ -86,7 +93,7 @@ else:
     rval = False
 
 # Cam setup
-# FIXME: A lot of this conversion/transform/mat code is mysterious to me... it comes from openvr_camera
+# FIXME: A lot of this conversion/transform/git mat code is mysterious to me... it comes from openvr_camera
 convert_coordinate_system = np.identity(4)
 convert_coordinate_system[:3, :3] = Rotation.from_euler('XYZ',(180, 0, 0), degrees=True).as_matrix()
 camera_model = read_write_model.CAMERA_MODEL_NAMES['SIMPLE_PINHOLE']

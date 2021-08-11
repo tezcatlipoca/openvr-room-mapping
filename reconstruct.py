@@ -4,7 +4,7 @@ import sys
 import os
 import shutil
 
-import read_write_model
+from vendor import read_write_model 
 
 class ColmapDelegator:
   """Wrapper for calling colmap functions""" 
