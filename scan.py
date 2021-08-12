@@ -104,17 +104,20 @@ signal.signal(signal.SIGINT, signal_handler)
 # FIXME: A lot of this conversion/transform/git mat code is mysterious to me... it comes from openvr_camera
 convert_coordinate_system = np.identity(4)
 convert_coordinate_system[:3, :3] = Rotation.from_euler('XYZ',(180, 0, 0), degrees=True).as_matrix()
-camera_model = read_write_model.CAMERA_MODEL_NAMES['SIMPLE_RADIAL']
+
 cameras = {}
 image_dict = {}
 camera_to_puck_transforms = {}
+
+camera_model = read_write_model.CAMERA_MODEL_NAMES['SIMPLE_PINHOLE']
 num_cameras=1 # Headsets have 2 (openvr.VRSystem().getInt32TrackedDeviceProperty(device, openvr.Prop_NumCameras_Int32))
 camera_to_puck_mat = (openvr.HmdMatrix34_t*num_cameras) ()
 height, width = frame.shape[:2]
 cv2.resizeWindow("preview", height,width)
-init_params = np.array((420.000000, (width/num_cameras)/2, height/2, 0.000000))
+#init_params = np.array((420.000000, (width/num_cameras)/2, height/2, 0.000000))
+init_params = np.array((1.5,width/2,height/2))
 for i in range(num_cameras):
-    cam_id = db.add_camera(camera_model.model_id, width/2, height, init_params)
+    cam_id = db.add_camera(camera_model.model_id, width, height, init_params)
     camera_to_puck_transforms[cam_id] = pose_matrix_to_numpy(camera_to_puck_mat[i])
     cameras[cam_id] = read_write_model.Camera(id=cam_id, model=camera_model.model_name, width=width/num_cameras, height=height, params=init_params)
 camera_to_puck_mat = (openvr.HmdMatrix34_t*num_cameras) ()

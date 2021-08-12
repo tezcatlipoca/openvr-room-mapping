@@ -82,7 +82,7 @@ class ColmapFolder:
   
   @property
   def sparse_path(self):
-    return self.dataset_path / 'sparse2'
+    return self.dataset_path / 'sparse'
   
   @property
   def database_path(self):
@@ -155,18 +155,15 @@ if __name__ == "__main__":
   config = json.load(open("config.json","r"))
   path_to_colmap=config["settings"]["path_to_colmap"]
   
+  # Command line args
   parser = argparse.ArgumentParser()
   parser.add_argument("--colmap",type=str, default=path_to_colmap)
   parser.add_argument("--dataset_path", type=str, default="./OUTPUT")
   parser.add_argument("--reference_geo_reg", type=str, default=None)
-
   args = parser.parse_args()
 
   deleg = ColmapDelegator(args.colmap)
-
   folder = ColmapFolder(args.dataset_path)
-  print(folder)
-
   recon = Reconstruct(deleg, folder)
 
   if args.reference_geo_reg is not None:

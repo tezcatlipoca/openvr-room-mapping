@@ -22,7 +22,7 @@
     }
   ],
   "settings": {
-    "use_device":"mf_2",
+    "use_device":"mf_1",
     "interval_in_seconds":1,
     "camera_index":0,
     "blur_rejection_threshold":100,
