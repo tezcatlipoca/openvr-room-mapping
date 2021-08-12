@@ -125,6 +125,7 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
 
       image.save(save_dir.images_path / name)
 
+     
       image_obj = read_write_model.Image(camera_id=cam_id, name=name, transformation_matrix=world_to_cam)
 
       images.append(image_obj)
@@ -141,7 +142,7 @@ def take_steamvr_images(save_dir, num_images, delay_between_images):
 
   print("All pictures taken")
 
-  with open(save_dir.geo_reg_path, 'w') as geo_reg_file:
+  with open(save_dir.geo_reg_path, 'a') as geo_reg_file:
     for image in images:
       image_id = db.add_image(image=image)
       image.id = image_id

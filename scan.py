@@ -2,9 +2,13 @@ import openvr
 import time
 import json
 import cv2
+import shutil
 import pylab as plt
 import numpy as np
+import signal
+import sys
 from scipy.spatial.transform import Rotation
+from PIL import Image
 
 from reconstruct import ColmapFolder
 from vendor import triad_openvr 
@@ -21,7 +25,13 @@ colors = config["colors"]
 
 # Output
 output_directory = "./OUTPUT"
-db = database.COLMAPDatabase.connect(ColmapFolder(output_directory).database_path)
+try:
+    print("Rebuilding:"+output_directory)
+    shutil.rmtree(output_directory)
+except OSError as e:
+    print ("Error: %s - %s." % (e.filename, e.strerror))
+output = ColmapFolder(output_directory)
+db = database.COLMAPDatabase.connect(output.database_path)
 db.create_tables()
 
 # Draws axes on the plot
@@ -44,6 +54,21 @@ def pose_matrix_to_numpy(pose_matrix):
         return pose_arr
     except:
         return []
+
+
+# Cleanup
+def signal_handler(sig, frame):
+    print("\n\nCleanup...")
+    db.commit()
+    db.close()
+    plt.show()
+    v.release()
+    openvr.shutdown()
+    cv2.destroyWindow("preview")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
 
 
 ###################################################################################
@@ -96,6 +121,7 @@ camera_to_puck_mat = (openvr.HmdMatrix34_t*num_cameras) ()
 
 image_count=0
 elapsed = interval
+geo_reg_file = open(output.geo_reg_path, 'w')
 while rval:
     rval, frame = vc.read()
     if(elapsed >= interval):
@@ -111,7 +137,7 @@ while rval:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         focus_measure =  cv2.Laplacian(gray, cv2.CV_64F).var()
         is_blurry = (focus_measure < blur_threshold)
-        text = "Blurry!" if is_blurry else "OK!" 
+        text = "Blurry!" if is_blurry else "OK" 
         color = colors["red"] if is_blurry else colors["green"]
         cv2.putText(
             frame, 
@@ -123,30 +149,27 @@ while rval:
         # Reset time, record position
         start = time.time()
         if(device_name in v.devices and not is_blurry):
-            # FIXME: A lot of this matrix transform code is mysterious to me... it comes from openvr_camera
-            # I suspect it is not correct for the puck (vs the HMD where it came from) Also possibly the euler pose
-            # is not what it's expecting in the first place?
-            puck_pose_arr = v.devices[device_name].get_pose_matrix()
-            world_to_puck = pose_matrix_to_numpy(puck_pose_arr)
+            pose_mat = v.devices[device_name].get_pose_matrix()
+            world_to_puck = pose_matrix_to_numpy(pose_mat)
             world_to_cams = {id_:world_to_puck @ head_to_cam @ convert_coordinate_system for (id_,head_to_cam) in camera_to_puck_transforms.items()}
             for j, (cam_id, world_to_cam) in enumerate(world_to_cams.items()):
+                # Update plot
                 draw_axes(ax, transform_mat=world_to_puck)
-                # FIXME: Should add to db (see db.add_image in openvr_camera.py)
+               
                 # Record frame to image folder
                 name = f"{image_count:03d}_cam{j}.jpg"
-                print(name)
                 path = output_directory + "/images/" + name
                 cv2.imwrite(path, original_frame)
+
+                # Add image metadata to database / georeg
+                image_metadata = read_write_model.Image(camera_id=cam_id, name=name, transformation_matrix=world_to_puck)
+                image_id = db.add_image(image=image_metadata)
+                image_metadata.id = image_id
+                geo_reg_file.write(f"{name} {' '.join(map(str, image_metadata.transformation_matrix[0:3, 3]))}\n")
+
                 image_count=image_count+1
             fig.show()
             fig.canvas.draw()
             fig.canvas.flush_events()
     elapsed = time.time() - start
 
-# Cleanup
-db.commit()
-db.close()
-plt.show()
-vc.release()
-openvr.shutdown()
-cv2.destroyWindow("preview")
