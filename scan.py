@@ -56,31 +56,15 @@ def pose_matrix_to_numpy(pose_matrix):
         return []
 
 
-# Cleanup
-def signal_handler(sig, frame):
-    print("\n\nCleanup...")
-    db.commit()
-    db.close()
-    plt.show()
-    v.release()
-    openvr.shutdown()
-    cv2.destroyWindow("preview")
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-
-
-
 ###################################################################################
 print("\n\nLooking for MFPucks...")
 print("==============================================")
 v = triad_openvr.triad_openvr("config.json")
 v.print_discovered_objects()
-vc = cv2.VideoCapture(camera_index)
 
 print("\n\nInitializing Camera...")
 print("==============================================")
-
+vc = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
 
 # Init Plot (graph image positions)
 plt.show()
@@ -100,6 +84,20 @@ if vc.isOpened():
     rval, frame = vc.read()
 else:
     rval = False
+
+# Cleanup handler
+def signal_handler(sig, frame):
+    print("\n\nShutdown...")
+    print("==============================================")
+    db.close()
+    vc.release()
+    plt.close()
+    openvr.shutdown()
+    cv2.destroyWindow("preview")
+    print("...DONE!")
+    sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+
 
 # Cam setup
 # FIXME: A lot of this conversion/transform/git mat code is mysterious to me... it comes from openvr_camera
@@ -160,10 +158,12 @@ while rval:
                 name = f"{image_count:03d}_cam{j}.jpg"
                 path = output_directory + "/images/" + name
                 cv2.imwrite(path, original_frame)
+                print(name)
 
                 # Add image metadata to database / georeg
                 image_metadata = read_write_model.Image(camera_id=cam_id, name=name, transformation_matrix=world_to_puck)
                 image_id = db.add_image(image=image_metadata)
+                db.commit()
                 image_metadata.id = image_id
                 geo_reg_file.write(f"{name} {' '.join(map(str, image_metadata.transformation_matrix[0:3, 3]))}\n")
 
