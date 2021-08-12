@@ -101,7 +101,7 @@ while rval:
     if(elapsed >= interval):
         # Blur detection also detects black frames, this is useful because you can "pause" shooting by covering the lens.
         # Mostly I want it because I'd like to feed this video frame-grabs and need to ensure those aren't blurry.
-        
+
         # https://www.pyimagesearch.com/2015/09/07/blur-detection-with-opencv/
         # compute the Laplacian of the image and then return the focus
         # measure, which is simply the variance of the Laplacian
@@ -126,7 +126,7 @@ while rval:
             # FIXME: A lot of this matrix transform code is mysterious to me... it comes from openvr_camera
             # I suspect it is not correct for the puck (vs the HMD where it came from) Also possibly the euler pose
             # is not what it's expecting in the first place?
-            puck_pose_arr = v.devices[device_name].get_pose_euler()
+            puck_pose_arr = v.devices[device_name].get_pose_matrix()
             world_to_puck = pose_matrix_to_numpy(puck_pose_arr)
             world_to_cams = {id_:world_to_puck @ head_to_cam @ convert_coordinate_system for (id_,head_to_cam) in camera_to_puck_transforms.items()}
             for j, (cam_id, world_to_cam) in enumerate(world_to_cams.items()):
