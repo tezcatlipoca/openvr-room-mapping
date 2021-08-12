@@ -89,6 +89,7 @@ else:
 def signal_handler(sig, frame):
     print("\n\nShutdown...")
     print("==============================================")
+    read_write_model.write_model(cameras, image_dict, {}, output.sparse_path, '.txt')
     db.close()
     vc.release()
     plt.close()
@@ -105,6 +106,7 @@ convert_coordinate_system = np.identity(4)
 convert_coordinate_system[:3, :3] = Rotation.from_euler('XYZ',(180, 0, 0), degrees=True).as_matrix()
 camera_model = read_write_model.CAMERA_MODEL_NAMES['SIMPLE_PINHOLE']
 cameras = {}
+image_dict = {}
 camera_to_puck_transforms = {}
 num_cameras=1 # Headsets have 2 (openvr.VRSystem().getInt32TrackedDeviceProperty(device, openvr.Prop_NumCameras_Int32))
 camera_to_puck_mat = (openvr.HmdMatrix34_t*num_cameras) ()
@@ -144,7 +146,7 @@ while rval:
             cv2.FONT_HERSHEY_SIMPLEX, 0.8, (color["B"], color["G"], color["R"]),3)
         cv2.imshow("preview", frame)
 
-        # Reset time, record position
+        # If we have a good image, record it and the position
         start = time.time()
         if(device_name in v.devices and not is_blurry):
             pose_mat = v.devices[device_name].get_pose_matrix()
@@ -165,6 +167,7 @@ while rval:
                 image_id = db.add_image(image=image_metadata)
                 db.commit()
                 image_metadata.id = image_id
+                image_dict[image_id] = image_metadata
                 geo_reg_file.write(f"{name} {' '.join(map(str, image_metadata.transformation_matrix[0:3, 3]))}\n")
 
                 image_count=image_count+1
