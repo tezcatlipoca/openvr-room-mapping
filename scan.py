@@ -104,7 +104,7 @@ signal.signal(signal.SIGINT, signal_handler)
 # FIXME: A lot of this conversion/transform/git mat code is mysterious to me... it comes from openvr_camera
 convert_coordinate_system = np.identity(4)
 convert_coordinate_system[:3, :3] = Rotation.from_euler('XYZ',(180, 0, 0), degrees=True).as_matrix()
-camera_model = read_write_model.CAMERA_MODEL_NAMES['SIMPLE_PINHOLE']
+camera_model = read_write_model.CAMERA_MODEL_NAMES['SIMPLE_RADIAL']
 cameras = {}
 image_dict = {}
 camera_to_puck_transforms = {}
