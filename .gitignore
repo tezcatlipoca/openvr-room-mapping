@@ -1,10 +1,4 @@
-NOTES.md
 __pycache__
-database.db
-geo_regis.txt
-sparse*/
-images
-dense
-scanner.py
-OUTPUT
+OUTPUT*
 SAMPLE_OUTPUT
+*.rar
