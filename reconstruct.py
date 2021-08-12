@@ -100,7 +100,7 @@ class Reconstruct:
 
   def auto_reconstruct(self, reference_reconstruct=None):
     if reference_reconstruct is not None:
-
+    
       if not (self.folder.path / 'combined').exists():      
         shutil.copytree(reference_reconstruct.path, self.folder.path / 'combined')
         
@@ -149,9 +149,15 @@ class Reconstruct:
 
 if __name__ == "__main__":
   import argparse
+  import json
+
+  # Settings from config.json
+  config = json.load(open("config.json","r"))
+  path_to_colmap=config["settings"]["path_to_colmap"]
+  
   parser = argparse.ArgumentParser()
-  parser.add_argument("--colmap", required=True)
-  parser.add_argument("--dataset_path", type=str, default="./")
+  parser.add_argument("--colmap",type=str, default=path_to_colmap)
+  parser.add_argument("--dataset_path", type=str, default="./OUTPUT/")
   parser.add_argument("--reference_geo_reg", type=str, default=None)
 
   args = parser.parse_args()
