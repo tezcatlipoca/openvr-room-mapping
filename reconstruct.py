@@ -157,7 +157,7 @@ if __name__ == "__main__":
   
   parser = argparse.ArgumentParser()
   parser.add_argument("--colmap",type=str, default=path_to_colmap)
-  parser.add_argument("--dataset_path", type=str, default="./OUTPUT/")
+  parser.add_argument("--dataset_path", type=str, default="./OUTPUT")
   parser.add_argument("--reference_geo_reg", type=str, default=None)
 
   args = parser.parse_args()
@@ -165,6 +165,7 @@ if __name__ == "__main__":
   deleg = ColmapDelegator(args.colmap)
 
   folder = ColmapFolder(args.dataset_path)
+  print(folder)
 
   recon = Reconstruct(deleg, folder)
 
